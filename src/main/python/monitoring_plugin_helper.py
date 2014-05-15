@@ -3,7 +3,7 @@ __author__ = 'mhoyer'
 import sys
 import numbers
 
-class Metric():
+class Metric(object):
 
     def __init__(self, label, value, uom, warn, crit, min, max):
         self.label = label
@@ -15,8 +15,11 @@ class Metric():
         self.max = max
         self.validate()
 
+    def __str__(self):
+        return self.get_perfdata_string()
+
     @staticmethod
-    def validate_uom(uom):
+    def _validate_uom(uom):
         valid_uom = ['%', 's', 'ms', 'us', 'c', 'B', 'KB', 'MB', 'GB', 'TB']
 
         if uom:
@@ -25,54 +28,55 @@ class Metric():
         return True
 
     @staticmethod
-    def validate_numeric_value(value):
+    def _validate_numeric_value(value):
         if not isinstance(value, numbers.Number):
             raise ValueError("Value must be numeric, got " + str(value) + " (" + str(type(value)) + ")")
         return True
 
     @staticmethod
-    def validate_string(value):
+    def _validate_string(value):
         if not isinstance(value, basestring):
             raise ValueError("Value must be a string, got " + str(value) + " (" + str(type(value)) + ")")
         return True
 
+    @classmethod
+    def _validate_label(cls_obj, label):
+        if not label:
+            raise ValueError("Metric has no label")
+        cls_obj._validate_string(label)
+        return True
+
+    @classmethod
+    def _validate_value(cls_obj, value):
+        if not value:
+            raise ValueError("Metric has no value")
+        cls_obj._validate_numeric_value(value)
+        return True
+
     def validate(self):
         # mandatory params must be given
-        if not self.label:
-            raise ValueError("Metric has no label")
-        if not self.value:
-            raise ValueError("Metric has no value")
+        self._validate_label(self.label)
+        self._validate_value(self.value)
 
-        self.validate_numeric_value(self.value)
-        self.validate_uom(self.uom)
+        self._validate_numeric_value(self.value)
+        self._validate_uom(self.uom)
 
         # optional params
         if self.warn:
-            self.validate_numeric_value(self.warn)
+            self._validate_numeric_value(self.warn)
         if self.crit:
-            self.validate_numeric_value(self.crit)
+            self._validate_numeric_value(self.crit)
         if self.min:
-            self.validate_numeric_value(self.min)
+            self._validate_numeric_value(self.min)
         if self.max:
-            self.validate_numeric_value(self.max)
+            self._validate_numeric_value(self.max)
 
     def get_perfdata_string(self):
-
-        perfdata_string = "'{0}'={1}".format(self.label, self.value)
-        if self.uom:
-            perfdata_string += self.uom
-        if self.warn:
-            perfdata_string += ';' + str(self.warn) + ';'
-        if self.crit:
-            perfdata_string += str(self.crit) + ';'
-        if self.min:
-            perfdata_string += str(self.min) + ';'
-        if self.max:
-            perfdata_string += str(self.max)
-        return perfdata_string
+        return "'{0}'={1}{2};{3};{4};{5};{6}".format(self.label, self.value, self.uom or '', self.warn or '',
+                                                                self.crit or '', self.min or '', self.max or '')
 
 
-class Output():
+class Output(object):
 
     def exit_ok(message):
         print "OK: %s" % message
@@ -90,6 +94,6 @@ class Output():
         print "Unknown: %s" % message
         sys.exit(3)
 
-    def get_perfdata_string(perfdata_list):
-        for item in perfdata_list:
-            item
+    @staticmethod
+    def render_perfdata_string(metric_list):
+        return ' '.join(str(metric) for metric in metric_list)
