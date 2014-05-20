@@ -2,32 +2,27 @@ from pybuilder.core import use_plugin, init, Author
 
 use_plugin("python.install_dependencies")
 use_plugin("python.core")
+use_plugin("python.coverage")
 use_plugin("python.unittest")
 use_plugin("python.distutils")
-use_plugin('copy_resources')
-#use_plugin('filter_resources')
 
 authors = [Author('Marco Hoyer', 'marco_hoyer@gmx.de')]
-description = """monitoring-plugin-helper - A little toolset to write nagios/icinga plugins
+description = """python-monitoring-plugin-helper - A little toolset to write nagios/icinga plugins
 
 """
 
-name = 'monitoring-plugin-helper'
+name = 'python-monitoring-plugin-helper'
 license = 'GNU GPL v3'
-summary = 'monitoring-plugin-helper'
-url = 'https://github.com/marco-hoyer/check_graphite'
+summary = 'python-monitoring-plugin-helper'
+url = 'https://github.com/marco-hoyer/python-monitoring-plugin-helper'
 version = '1.0'
 
 default_task = ['publish']
 
 @init
 def initialize(project):
-    
-    project.depends_on("argparse")
+
     project.build_depends_on("unittest2")
-    
-    project.set_property('copy_resources_target', '$dir_dist')
-    project.get_property('copy_resources_glob').append('setup.cfg')
 
     project.set_property('distutils_classifiers', [
         'Development Status :: 4 - Beta',
@@ -40,7 +35,6 @@ def initialize(project):
         'Topic :: System :: Monitoring',
         'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
         'License :: OSI Approved :: MIT License',
     ])
 

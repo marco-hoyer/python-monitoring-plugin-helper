@@ -78,18 +78,22 @@ class Metric(object):
 
 class Output(object):
 
+    @staticmethod
     def exit_ok(message):
         print "OK: %s" % message
         sys.exit(0)
 
-    def exit_warning(message, perfdata_string):
+    @staticmethod
+    def exit_warning(message):
         print "Warning: %s" % message
         sys.exit(1)
 
-    def exit_critical(message, perfdata_string):
+    @staticmethod
+    def exit_critical(message):
         print "Critical: %s" % message
         sys.exit(2)
 
+    @staticmethod
     def exit_unknown(message):
         print "Unknown: %s" % message
         sys.exit(3)
